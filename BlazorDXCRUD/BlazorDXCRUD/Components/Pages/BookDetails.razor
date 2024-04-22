@@ -1,0 +1,97 @@
+﻿<!-- Ruta de la vista actual -->
+@page "/bookDetails"
+
+<!-- Ruta para editar un libro pasandole como parametro su id -->
+@page "/bookDetails/{id:int}"
+
+<!-- Injectamos las clases con un nombre apuntando a ellas -->
+@inject IBookService BookService
+
+<!-- Para redirigir a rutas -->
+@inject NavigationManager NavigationManager
+
+<!-- Titulo de la vista -->
+<PageTitle>Detalles Libro</PageTitle>
+
+<!-- h1 de la vista -->
+<h1>Detalles Libro</h1>
+
+<!-- Formulario de blazor pasandole como modelo (book) y con un evento OnSubmit -->
+<EditForm Model="book" OnSubmit="SaveBook" FormName="saveBooks">
+    <table class="table">
+        <tr>
+            <td>Id: </td>
+            <td><InputNumber class="form-control" id="BookId" @bind-Value="book.BookId" readonly></InputNumber></td>
+        </tr>
+        <tr>
+            <td>Title: </td>
+            <!-- Titulo del libro bindeado al modelo (book) -->
+            <td><InputText class="form-control" id="title" @bind-Value="book.Title"></InputText></td>
+        </tr>
+        <tr>
+            <td>Autor: </td>
+            <!-- Autor del libro bindeado al modelo (book) -->
+            <td><InputText class="form-control" id="author" @bind-Value="book.Author"></InputText></td>
+        </tr>
+
+        <!-- Area de botones -->
+        <tr>
+            <td colspan="2" style="text-align:center">
+                <!-- Boton de guardado -->
+                <button type="submit">Save</button>
+                <!-- Boton para volver atras con el evento onclick -->
+                <button @onclick="Cancel">Cancel</button>
+            </td>
+        </tr>
+    </table>
+</EditForm>
+
+@code {
+    //Variable que le llega en la ruta como parametro {id: int}
+    [Parameter]
+    public int id { get; set; }
+
+    //Objeto book usado como modelo del formulario
+    [SupplyParameterFromForm]
+    public Book book { get; set; }
+
+    //Cargar el libro por id
+    protected override async Task OnInitializedAsync()
+    {
+        //Comprobamos que se le ha pasado un id como parametro
+        if (id != 0)
+        {
+            //Si el libro ya ha sido cargado no lo volvemos a cargar
+            if(book.BookId == 0)
+            {
+                book = await BookService.GetBookDetails(id);
+            }
+        }
+    }
+
+    //Inicializamos el book al iniciar la aplicacion
+    protected override void OnInitialized() => book ??= new();
+
+    //Metodo para guardar el libro y reenviar al inicio
+    protected async Task SaveBook()
+    {
+        //Comprobamos que se han introducido datos en el formulario
+        if(book.Title != "" && book.Author != "")
+        {
+            //Metodo para guardar libro en la BD
+            await BookService.SaveBook(book);
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            Cancel();
+        }
+    }
+
+    //Metodo para dirigir al inicio
+    protected void Cancel()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}
+

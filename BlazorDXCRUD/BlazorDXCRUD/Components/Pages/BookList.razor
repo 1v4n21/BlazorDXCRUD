@@ -1,0 +1,128 @@
+﻿<!-- Ruta de la vista actual -->
+@page "/"
+
+<!-- Utilizar DOM en Blazor -->
+@rendermode InteractiveServer
+
+<!-- Injectamos las clases con un nombre apuntando a ellas -->
+@inject IBookService BookService
+
+<!-- Para redirigir a rutas -->
+@inject NavigationManager NavigationManager
+
+<!-- Titulo de la vista -->
+<PageTitle>Lista de Libros</PageTitle>
+
+<br><br>
+
+<!-- h1 de la vista -->
+<h1>Lista de Libros</h1>
+
+<!-- Descripción de la web -->
+<p>Esta pagina muestra una lista de todos los libros.</p>
+<!-- Mensaje de error en el caso de lanzar excepcion -->
+@Message
+
+<!-- Enlace para añadir libro -->
+<div>
+	<a href="/bookDetails"><i>Añadir nuevo libro</i></a>
+</div>
+
+<br>
+
+<DxPopup HeaderText="Popup"
+		 @bind-Visible="@PopupVisible"
+		 BodyText="Los campos son obligatorios">
+</DxPopup>
+
+<!-- Comprobamos que ha cargado los libros -->
+@if(books == null)
+{
+	<p><em>Cargando...</em></p>
+}
+else
+{
+	<!-- Tabla con los libros y sus datos -->
+	<!-- Panel de grupo, de filtracion, de edicion y eventos de borrado y editado -->
+	<DxGrid Data="@books" ShowGroupPanel="true" ShowFilterRow="true"
+			EditMode="GridEditMode.EditRow"
+			EditModelSaving="SaveBook"
+			DataItemDeleting="DeleteBook">
+		<Columns>
+			<!-- Columnas con los atributos de libro -->
+			<DxGridDataColumn FieldName="Title"/>
+			<DxGridDataColumn FieldName="Author"/>
+
+			<!-- Columna para poder borrar y editar -->
+			<DxGridCommandColumn Width="150px" />
+		</Columns>
+
+		<!-- Sumario tota de libros -->
+		<TotalSummary>
+			<DxGridSummaryItem FooterColumnName="Title"
+							   SummaryType=GridSummaryItemType.Count />
+		</TotalSummary>
+	</DxGrid>
+}
+
+@code {
+	//Array de todos los libros existentes en la BD
+	public IEnumerable<Book> books { get; set; }
+
+	public string Message { get; set; }
+
+	bool PopupVisible { get; set; } = false;
+
+	//Metodo que se ejecuta al iniciar la web
+	protected override async Task OnInitializedAsync()
+	{
+		await RefreshBook();
+	}
+
+	//Metodo para guardar el libro
+	protected async Task SaveBook(GridEditModelSavingEventArgs e)
+	{
+		//Objeto libro del grid
+		var editModel = (Book)e.EditModel;
+
+		//Comprobamos que se han introducido datos en el formulario
+		if (editModel.Title != "" && editModel.Author != "")
+		{
+			//Metodo para guardar libro en la BD
+			await BookService.SaveBook(editModel);
+
+			await RefreshBook();
+		}
+		else
+		{
+			//Mostrar pop up
+			PopupVisible = true;
+		}
+	}
+
+	//Borrar libro por su id
+	protected async Task DeleteBook(GridDataItemDeletingEventArgs e)
+	{
+		var editModel = (Book)e.DataItem;
+
+		await BookService.DeleteBook(editModel.BookId);
+
+		//Volvemos a cargar todos los datos tras eliminar el libro
+		await RefreshBook();
+	}
+
+	//Metodo para cargar los libros
+	protected async Task RefreshBook()
+	{
+		try
+		{
+			//Metodo que carga todos los datos de la BD
+			books = await BookService.GetAllBook();
+		}
+		catch (Exception e)
+		{
+			//Mensaje de error excepcion
+			Message = e.Message;
+		}
+	}
+}
