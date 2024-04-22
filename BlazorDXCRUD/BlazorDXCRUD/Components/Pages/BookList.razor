@@ -4,6 +4,9 @@
 <!-- Utilizar DOM en Blazor -->
 @rendermode InteractiveServer
 
+<!-- Para que aparezca el mensaje de cargando... con delay -->
+@attribute [StreamRendering]
+
 <!-- Injectamos las clases con un nombre apuntando a ellas -->
 @inject IBookService BookService
 
@@ -30,7 +33,7 @@
 
 <br>
 
-<DxPopup HeaderText="Popup"
+<DxPopup HeaderText="Mensaje"
 		 @bind-Visible="@PopupVisible"
 		 BodyText="Los campos son obligatorios">
 </DxPopup>
@@ -44,14 +47,16 @@ else
 {
 	<!-- Tabla con los libros y sus datos -->
 	<!-- Panel de grupo, de filtracion, de edicion y eventos de borrado y editado -->
-	<DxGrid Data="@books" ShowGroupPanel="true" ShowFilterRow="true"
+	<!-- KeyField = campo del id del libro -->
+	<DxGrid Data="@books" KeyFieldName="BookId"
+			ShowGroupPanel="true" ShowFilterRow="true"
 			EditMode="GridEditMode.EditRow"
 			EditModelSaving="SaveBook"
 			DataItemDeleting="DeleteBook">
 		<Columns>
 			<!-- Columnas con los atributos de libro -->
-			<DxGridDataColumn FieldName="Title"/>
-			<DxGridDataColumn FieldName="Author"/>
+			<DxGridDataColumn FieldName="Title" Caption="Titulo"/>
+			<DxGridDataColumn FieldName="Author" Caption="Autor"/>
 
 			<!-- Columna para poder borrar y editar -->
 			<DxGridCommandColumn Width="150px" />
@@ -76,6 +81,9 @@ else
 	//Metodo que se ejecuta al iniciar la web
 	protected override async Task OnInitializedAsync()
 	{
+		//Tiempo de espera de 1sg
+		await Task.Delay(1000);
+
 		await RefreshBook();
 	}
 
@@ -84,18 +92,27 @@ else
 	{
 		//Objeto libro del grid
 		var editModel = (Book)e.EditModel;
+		var dataItem = e.IsNew ? new Book() : (Book)e.DataItem;
 
 		//Comprobamos que se han introducido datos en el formulario
 		if (editModel.Title != "" && editModel.Author != "")
 		{
-			//Metodo para guardar libro en la BD
-			await BookService.SaveBook(editModel);
+			//Obtenemos los datos del formulario
+			dataItem.Title = editModel.Title;
+			dataItem.Author = editModel.Author;
 
+			//Comprobamos si es editado o es nuevo
+			if (e.IsNew)
+				await BookService.InsertBook(dataItem);
+			else
+				await BookService.UpdateBook(dataItem);
+
+			//Refrscamos los libros
 			await RefreshBook();
 		}
 		else
 		{
-			//Mostrar pop up
+			//Mostrar pop up de validación
 			PopupVisible = true;
 		}
 	}
