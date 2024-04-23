@@ -61,9 +61,11 @@ namespace BlazorDXCRUD.Data
 		}
 
 		//Metodo para actualizar venta
-		public Task<bool> UpdateVenta(Venta venta)
+		public async Task<bool> UpdateVenta(Venta venta)
 		{
-			throw new NotImplementedException();
+			_context.Entry(venta).State = EntityState.Modified;
+
+			return await _context.SaveChangesAsync() > 0;
 		}
 	}
 }

@@ -6,6 +6,9 @@
         public int BookId { get; set; }
         public string Title { get; set; }
         public string Author { get; set; }
-        public DateTime Date { get; set; }
-    }
+
+        //Poner fecha actual por defecto
+        public DateTime Date { get; set; } = DateTime.Now;
+
+	}
 }

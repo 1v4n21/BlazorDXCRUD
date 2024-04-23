@@ -1,0 +1,160 @@
+﻿<!-- Ruta de la vista actual -->
+@page "/listaVentas"
+@using BlazorDXCRUD.Models
+
+<!-- Utilizar DOM en Blazor -->
+@rendermode InteractiveServer
+
+<!-- Para que aparezca el mensaje de cargando... con delay -->
+@attribute [StreamRendering]
+
+<!-- Injectamos las clases con un nombre apuntando a ellas -->
+@inject IVentaService VentaService
+
+<!-- Clse para redirigir a rutas -->
+@inject NavigationManager NavigationManager
+
+<!-- Titulo de la pagina -->
+<PageTitle>Grid de Ventas</PageTitle>
+
+<br>
+<br>
+
+<!-- h1 de la vista -->
+<h1>Grid de Ventas</h1>
+
+<!-- Descripción de la web -->
+<p>Esta pagina muestra un grid de todas las ventas.</p>
+
+<!-- Mensaje de error en el caso de lanzar excepcion -->
+@Message
+
+<br>
+
+<!-- Popup para mostrar cuando no se completan todos los campos -->
+<DxPopup HeaderText="Mensaje"
+		 @bind-Visible="@PopupVisible"
+		 BodyText="Los campos son obligatorios">
+</DxPopup>
+
+<!-- Comprobamos que ha cargado las ventas -->
+@if (ventas == null)
+{
+	<!-- Texto que muestra antes de recargar las ventas -->
+	<p><em>Cargando...</em></p>
+}
+else
+{
+	<!-- Tabla con las ventas y sus datos -->
+	<!-- Panel de grupo, de filtracion, de edicion y eventos de borrado y editado -->
+	<!-- KeyField = campo del id de la venta -->
+	<DxGrid Data="@ventas" KeyFieldName="Id"
+			ShowGroupPanel="true" ShowFilterRow="true"
+			EditMode="GridEditMode.EditRow"
+			EditModelSaving="SaveVenta"
+			DataItemDeleting="DeleteVenta">
+		<Columns>
+			<!-- Columnas con los atributos de venta -->
+			<DxGridDataColumn FieldName="comprador" Caption="Comprador" />
+			<DxGridDataColumn FieldName="articulo" Caption="Articulo" />
+			<DxGridDataColumn FieldName="cantidad" Caption="Ctd" />
+			<DxGridDataColumn FieldName="precio" Caption="€" />
+
+			<!-- Fecha y formato de la fecha -->
+			<DxGridDataColumn FieldName="Date" Caption="Fecha" 
+				SortOrder="GridColumnSortOrder.Descending"
+							  SortIndex="0" />
+
+			<!-- Columna para poder borrar y editar -->
+			<DxGridCommandColumn Width="150px" />
+		</Columns>
+
+		<!-- Sumario total de libros en base al titulo -->
+		<TotalSummary>
+			<DxGridSummaryItem FooterColumnName="articulo"
+							   SummaryType=GridSummaryItemType.Count />
+		</TotalSummary>
+	</DxGrid>
+}
+
+@code {
+	//Array de todas las ventas existentes en la BD
+	public IEnumerable<Venta> ventas { get; set; }
+
+	//Variable mensaje para mostrar las excepciones en el try catch
+	public string Message { get; set; }
+
+	//Booleano para mostrar el popup
+	bool PopupVisible { get; set; } = false;
+
+	//Metodo que se ejecuta al iniciar la web
+	protected override async Task OnInitializedAsync()
+	{
+		//Tiempo de espera de 1sg
+		await Task.Delay(1000);
+
+		//Refrescamos los libros
+		await RefreshVenta();
+	}
+
+	//Metodo para guardar el libro
+	protected async Task SaveVenta(GridEditModelSavingEventArgs e)
+	{
+		//Objeto libro del grid
+		var editModel = (Venta)e.EditModel;
+		var dataItem = e.IsNew ? new Venta() : (Venta)e.DataItem;
+
+		//Comprobamos que se han introducido datos en el formulario
+		if (editModel.articulo != "" && editModel.cantidad != 0)
+		{
+			//Obtenemos los datos del formulario
+			dataItem.comprador = editModel.comprador;
+			dataItem.articulo = editModel.articulo;
+			dataItem.cantidad = editModel.cantidad;
+			dataItem.precio = editModel.precio;
+
+			dataItem.Date = editModel.Date;
+
+			//Comprobamos si es editado o es nuevo para hacer un Insert o Update
+			if (e.IsNew)
+				await VentaService.InsertVenta(dataItem);
+			else
+				await VentaService.UpdateVenta(dataItem);
+
+			//Refrscamos los libros
+			await RefreshVenta();
+		}
+		else
+		{
+			//Mostrar pop up de validación
+			PopupVisible = true;
+		}
+	}
+
+	//Borrar libro por su id
+	protected async Task DeleteVenta(GridDataItemDeletingEventArgs e)
+	{
+		var editModel = (Venta)e.DataItem;
+
+		//Borramos el libro pasando la id del libro seleccionado
+		await VentaService.DeleteVenta(editModel.Id);
+
+		//Volvemos a cargar todos los datos tras eliminar el libro
+		await RefreshVenta();
+	}
+
+	//Metodo para cargar los libros
+	protected async Task RefreshVenta()
+	{
+		try
+		{
+			//Metodo que carga todos los datos de la BD
+			ventas = await VentaService.GetAllVentas();
+		}
+		catch (Exception e)
+		{
+			//Mensaje de error excepcion
+			Message = e.Message;
+		}
+	}
+}
