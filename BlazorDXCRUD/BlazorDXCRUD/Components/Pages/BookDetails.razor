@@ -20,6 +20,7 @@
 <EditForm Model="book" OnSubmit="SaveBook" FormName="saveBooks">
     <table class="table">
         <tr>
+            <!-- Id del libro bindeado al modelo (book) -->
             <td>Id: </td>
             <td><InputNumber class="form-control" id="BookId" @bind-Value="book.BookId" readonly></InputNumber></td>
         </tr>
@@ -32,6 +33,11 @@
             <td>Autor: </td>
             <!-- Autor del libro bindeado al modelo (book) -->
             <td><InputText class="form-control" id="author" @bind-Value="book.Author"></InputText></td>
+        </tr>
+        <tr>
+            <td>Fecha: </td>
+            <!-- Fecha del libro bindeado al modelo (book) -->
+            <td><InputDate class="form-control" id="title" @bind-Value="book.Date"></InputDate></td>
         </tr>
 
         <!-- Area de botones -->

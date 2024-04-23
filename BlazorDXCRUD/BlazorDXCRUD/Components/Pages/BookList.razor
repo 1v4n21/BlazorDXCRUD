@@ -10,10 +10,10 @@
 <!-- Injectamos las clases con un nombre apuntando a ellas -->
 @inject IBookService BookService
 
-<!-- Para redirigir a rutas -->
+<!-- Clse para redirigir a rutas -->
 @inject NavigationManager NavigationManager
 
-<!-- Titulo de la vista -->
+<!-- Titulo de la pagina -->
 <PageTitle>Lista de Libros</PageTitle>
 
 <br><br>
@@ -23,16 +23,18 @@
 
 <!-- Descripción de la web -->
 <p>Esta pagina muestra una lista de todos los libros.</p>
+
 <!-- Mensaje de error en el caso de lanzar excepcion -->
 @Message
 
-<!-- Enlace para añadir libro -->
+<!-- Enlace para ir a la pagina de añadir libro -->
 <div>
 	<a href="/bookDetails"><i>Añadir nuevo libro</i></a>
 </div>
 
 <br>
 
+<!-- Popup para mostrar cuando no se completan todos los campos -->
 <DxPopup HeaderText="Mensaje"
 		 @bind-Visible="@PopupVisible"
 		 BodyText="Los campos son obligatorios">
@@ -41,6 +43,7 @@
 <!-- Comprobamos que ha cargado los libros -->
 @if(books == null)
 {
+	<!-- Texto que muestra antes de recargar los libros -->
 	<p><em>Cargando...</em></p>
 }
 else
@@ -58,11 +61,14 @@ else
 			<DxGridDataColumn FieldName="Title" Caption="Titulo"/>
 			<DxGridDataColumn FieldName="Author" Caption="Autor"/>
 
+			<!-- Fecha y formato de la fecha -->
+			<DxGridDataColumn FieldName="Date" Caption="Fecha" DisplayFormat="D" />
+
 			<!-- Columna para poder borrar y editar -->
 			<DxGridCommandColumn Width="150px" />
 		</Columns>
 
-		<!-- Sumario tota de libros -->
+		<!-- Sumario total de libros en base al titulo -->
 		<TotalSummary>
 			<DxGridSummaryItem FooterColumnName="Title"
 							   SummaryType=GridSummaryItemType.Count />
@@ -74,8 +80,10 @@ else
 	//Array de todos los libros existentes en la BD
 	public IEnumerable<Book> books { get; set; }
 
+	//Variable mensaje para mostrar las excepciones en el try catch
 	public string Message { get; set; }
 
+	//Booleano para mostrar el popup
 	bool PopupVisible { get; set; } = false;
 
 	//Metodo que se ejecuta al iniciar la web
@@ -84,6 +92,7 @@ else
 		//Tiempo de espera de 1sg
 		await Task.Delay(1000);
 
+		//Refrescamos los libros
 		await RefreshBook();
 	}
 
@@ -100,8 +109,9 @@ else
 			//Obtenemos los datos del formulario
 			dataItem.Title = editModel.Title;
 			dataItem.Author = editModel.Author;
+			dataItem.Date = editModel.Date;
 
-			//Comprobamos si es editado o es nuevo
+			//Comprobamos si es editado o es nuevo para hacer un Insert o Update
 			if (e.IsNew)
 				await BookService.InsertBook(dataItem);
 			else
@@ -121,7 +131,8 @@ else
 	protected async Task DeleteBook(GridDataItemDeletingEventArgs e)
 	{
 		var editModel = (Book)e.DataItem;
-
+		
+		//Borramos el libro pasando la id del libro seleccionado
 		await BookService.DeleteBook(editModel.BookId);
 
 		//Volvemos a cargar todos los datos tras eliminar el libro
