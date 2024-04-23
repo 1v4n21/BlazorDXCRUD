@@ -15,7 +15,7 @@ builder.Services.AddDevExpressBlazor(options => {
 });
 
 //Añadimos los servicios al constructor de nuestra aplicacion
-builder.Services.AddDbContext<MyBooksContext>();
+builder.Services.AddDbContext<CreadorTablas>();
 builder.Services.AddScoped<IBookService, BookService>();
 
 var app = builder.Build();

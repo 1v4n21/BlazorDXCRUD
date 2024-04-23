@@ -7,10 +7,10 @@ namespace BlazorDXCRUD.Data
     public class BookService : IBookService
     {
         //Context es la base de datos
-        private readonly MyBooksContext _context;
+        private readonly CreadorTablas _context;
 
         //Introducimos en context la base de datos
-        public BookService(MyBooksContext context)
+        public BookService(CreadorTablas context)
         {
             _context = context;
         }

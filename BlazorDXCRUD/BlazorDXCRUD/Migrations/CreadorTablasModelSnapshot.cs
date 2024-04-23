@@ -4,19 +4,16 @@ using BlazorDXCRUD.Models1;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
 namespace BlazorDXCRUD.Migrations
 {
-    [DbContext(typeof(MyBooksContext))]
-    [Migration("20240423082549_Initial")]
-    partial class Initial
+    [DbContext(typeof(CreadorTablas))]
+    partial class CreadorTablasModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

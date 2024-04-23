@@ -5,7 +5,7 @@ namespace BlazorDXCRUD.Models1
 {
     //Clase que actua para acceder a la BD y crearla mediante EntityFramework
     //Le implementamos DbContext
-    public class MyBooksContext : DbContext
+    public class CreadorTablas : DbContext
     {
         public DbSet<Book> Books { get; set; }
         public DbSet<Venta> Ventas { get; set; }
