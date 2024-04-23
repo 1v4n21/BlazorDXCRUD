@@ -69,7 +69,7 @@ else
 			<DxGridCommandColumn Width="150px" />
 		</Columns>
 
-		<!-- Sumario total de libros en base al titulo -->
+		<!-- Sumario total de ventas en base al articulo -->
 		<TotalSummary>
 			<DxGridSummaryItem FooterColumnName="articulo"
 							   SummaryType=GridSummaryItemType.Count />
@@ -93,14 +93,14 @@ else
 		//Tiempo de espera de 1sg
 		await Task.Delay(1000);
 
-		//Refrescamos los libros
+		//Refrescamos las ventas
 		await RefreshVenta();
 	}
 
-	//Metodo para guardar el libro
+	//Metodo para guardar la venta
 	protected async Task SaveVenta(GridEditModelSavingEventArgs e)
 	{
-		//Objeto libro del grid
+		//Objeto venta del grid
 		var editModel = (Venta)e.EditModel;
 		var dataItem = e.IsNew ? new Venta() : (Venta)e.DataItem;
 
@@ -121,7 +121,7 @@ else
 			else
 				await VentaService.UpdateVenta(dataItem);
 
-			//Refrscamos los libros
+			//Refrscamos las ventas
 			await RefreshVenta();
 		}
 		else
@@ -131,19 +131,19 @@ else
 		}
 	}
 
-	//Borrar libro por su id
+	//Borrar venta por su id
 	protected async Task DeleteVenta(GridDataItemDeletingEventArgs e)
 	{
 		var editModel = (Venta)e.DataItem;
 
-		//Borramos el libro pasando la id del libro seleccionado
+		//Borramos la venta pasando el id de la venta seleccionada
 		await VentaService.DeleteVenta(editModel.Id);
 
-		//Volvemos a cargar todos los datos tras eliminar el libro
+		//Volvemos a cargar todos los datos tras eliminar la venta
 		await RefreshVenta();
 	}
 
-	//Metodo para cargar los libros
+	//Metodo para cargar las ventas
 	protected async Task RefreshVenta()
 	{
 		try

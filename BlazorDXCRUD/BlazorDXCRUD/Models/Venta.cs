@@ -1,5 +1,6 @@
 ﻿namespace BlazorDXCRUD.Models
 {
+	//Clase venta con todos sus atributos
 	public class Venta
 	{
 		public int Id { get; set; }
