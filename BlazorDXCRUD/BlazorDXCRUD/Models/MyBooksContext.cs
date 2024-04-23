@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BlazorDXCRUD.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlazorDXCRUD.Models1
 {
@@ -7,6 +8,7 @@ namespace BlazorDXCRUD.Models1
     public class MyBooksContext : DbContext
     {
         public DbSet<Book> Books { get; set; }
+        public DbSet<Venta> Ventas { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

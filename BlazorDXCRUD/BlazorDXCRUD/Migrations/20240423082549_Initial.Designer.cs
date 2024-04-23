@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorDXCRUD.Migrations
 {
     [DbContext(typeof(MyBooksContext))]
-    [Migration("20240423065102_Initial")]
+    [Migration("20240423082549_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -24,6 +24,36 @@ namespace BlazorDXCRUD.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("BlazorDXCRUD.Models.Venta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("articulo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("cantidadd")
+                        .HasColumnType("int");
+
+                    b.Property<string>("comprador")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("precio")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Ventas");
+                });
 
             modelBuilder.Entity("BlazorDXCRUD.Models1.Book", b =>
                 {
