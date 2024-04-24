@@ -18,7 +18,6 @@
 <PageTitle>Grid de Ventas</PageTitle>
 
 <br>
-<br>
 
 <!-- h1 de la vista -->
 <h1>Grid de Ventas</h1>
@@ -46,11 +45,10 @@
 else
 {
 	<!-- Tabla con las ventas y sus datos -->
-	<!-- Panel de grupo, de filtracion, de edicion y eventos de borrado y editado -->
+	<!-- Panel de grupo, de filtracion y eventos de borrado y editado/nuevo -->
 	<!-- KeyField = campo del id de la venta -->
 	<DxGrid Data="@ventas" KeyFieldName="Id"
 			ShowGroupPanel="true" ShowFilterRow="true"
-			EditMode="GridEditMode.EditRow"
 			EditModelSaving="SaveVenta"
 			DataItemDeleting="DeleteVenta">
 		<Columns>
@@ -65,19 +63,53 @@ else
 				SortOrder="GridColumnSortOrder.Descending"
 							  SortIndex="0" />
 
-			<!-- Columna para poder borrar y editar -->
-			<DxGridCommandColumn Width="150px" />
+			<!-- Columna con los botones de editar, eliminar y nuevo -->
+			<DxGridCommandColumn />
 		</Columns>
 
-		<!-- Sumario total de ventas en base al articulo -->
+		<!-- Sumario total de ventas en base al comprador -->
 		<TotalSummary>
-			<DxGridSummaryItem FooterColumnName="articulo"
+			<DxGridSummaryItem FooterColumnName="comprador"
 							   SummaryType=GridSummaryItemType.Count />
 		</TotalSummary>
+
+		<!-- Formulario de edicion con cada atributo de venta -->
+		<EditFormTemplate Context="editFormContext">
+			<DxFormLayout>
+				<DxFormLayoutItem Caption="Comprador:" ColSpanMd="6">
+					@editFormContext.GetEditor("comprador")
+				</DxFormLayoutItem>
+				<DxFormLayoutItem Caption="Articulo:" ColSpanMd="6">
+					<!-- ComboBox con todos los valores de articulos -->
+					<DxComboBox Data="@Articulos"
+                            NullText="Selecciona un articulo..."
+							@bind-Value="@Message">
+					</DxComboBox>
+				</DxFormLayoutItem>
+				<DxFormLayoutItem Caption="Ctd:" ColSpanMd="6">
+					@editFormContext.GetEditor("cantidad")
+				</DxFormLayoutItem>
+				<DxFormLayoutItem Caption="Precio:" ColSpanMd="6">
+					@editFormContext.GetEditor("precio")
+				</DxFormLayoutItem>
+				<DxFormLayoutItem Caption="Fecha:" ColSpanMd="6">
+					@editFormContext.GetEditor("Date")
+				</DxFormLayoutItem>
+			</DxFormLayout>
+		</EditFormTemplate>
 	</DxGrid>
 }
 
 @code {
+	// Define los Articulos aquí
+	public IEnumerable<string> Articulos = new List<string>() {
+		"Tornillo estrella",
+		"Tornillo pala",
+		"Tuerca",
+		"Clavo",
+		"Pasador",
+	};
+
 	//Array de todas las ventas existentes en la BD
 	public IEnumerable<Venta> ventas { get; set; }
 
