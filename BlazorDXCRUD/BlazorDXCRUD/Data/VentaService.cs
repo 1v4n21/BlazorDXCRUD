@@ -31,6 +31,14 @@ namespace BlazorDXCRUD.Data
 			return await _context.Ventas.ToListAsync();
 		}
 
+		// Método para obtener todas las ventas de un artículo específico
+		public async Task<IEnumerable<Venta>> GetVentasByArticulo(string nombreArticulo)
+		{
+			return await _context.Ventas
+				.Where(v => v.articulo == nombreArticulo)
+				.ToListAsync();
+		}
+
 		//Metodo para obtener venta por id
 		public async Task<Venta> GetVentaDetails(int id)
 		{

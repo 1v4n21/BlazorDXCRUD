@@ -1,0 +1,123 @@
+﻿@page "/chartVentas"
+@using BlazorDXCRUD.Models
+
+<!-- Injectamos las clases con un nombre apuntando a ellas -->
+@inject IVentaService VentaService
+
+<!-- Utilizar DOM en Blazor -->
+@rendermode InteractiveServer
+
+<!-- Titulo de la pagina -->
+<PageTitle>Chart de Ventas</PageTitle>
+
+<br>
+
+<!-- h1 de la vista -->
+<h1>Chart de Ventas</h1>
+
+<!-- Descripción de la web -->
+<p>Esta pagina muestra graficas de las ventas.</p>
+
+<!-- Mensaje de error en el caso de lanzar excepcion -->
+@Message
+
+<DxComboBox Data="Graficas" NullText="Selecciona un articulo..." 
+			FilteringMode="DataGridFilteringMode.Contains" @bind-Value="@seleccion"
+			@onclick="CargarGrafica"/>
+
+<br />
+
+@if (seleccion == "Tornillo estrella")
+{
+    <!-- Crea el grafico en base a los forecast -->
+    <DxChart Data="@ventas" LabelOverlap="ChartLabelOverlap.Hide">
+        <!-- Para que no se superpongan las etiquetas -->
+        <!-- Titulo de grafico -->
+        <DxChartTitle Text="Ventas">
+            <DxChartSubTitle Text="(tornillo estrella)" />
+        </DxChartTitle>
+
+        <!-- Eje de abajo fecha -->
+        <DxChartArgumentAxis>
+            <DxChartAxisTitle Text="Fecha" /> <!-- Texto -->
+            <DxChartAxisLabel Format='ChartElementFormat.ShortDate' /> <!-- Formato -->
+        </DxChartArgumentAxis>
+
+        <!-- Eje izq y eje der -->
+        <DxChartValueAxis>
+            <DxChartAxisTitle Text="Cantidad, unidades" />
+        </DxChartValueAxis>
+
+        <!-- Alinea con las temperaturas -->
+        <DxChartValueAxis Name="precio" Alignment="ChartAxisAlignment.Far">
+            <DxChartAxisTitle Text="Precio, €" />
+        </DxChartValueAxis>
+
+        <!-- Barras de precipitacion BarSeries -->
+        <DxChartBarSeries ArgumentField="@((Venta i) => i.Date)"
+                          ValueField="@((Venta i) => i.cantidad)"
+                          Name="Cantidad">
+
+            <!-- Mostrar etiquetas -->
+            <DxChartSeriesLabel Visible="true" />
+        </DxChartBarSeries>
+
+        <!-- Lineas de temperatura LineSeries -->
+        <DxChartLineSeries ArgumentField="@((Venta i) => i.Date)"
+                           ValueField="@((Venta i) => i.precio)"
+                           Name="precio"
+                           Axis="precio">
+            <!-- Modificar los puntos polygon, size 20 -->
+            <DxChartSeriesPoint Symbol="ChartPointSymbol.Polygon" Size="20" />
+
+            <!-- Mostrar Etiquetas visible=true width=2 -->
+            <DxChartSeriesLabel Visible="true">
+                <DxChartSeriesLabelConnector Visible="true" Width="2" />
+            </DxChartSeriesLabel>
+        </DxChartLineSeries>
+
+        <!-- Personalizar la leyenda Horizontal, Right -->
+        <DxChartLegend Orientation="Orientation.Horizontal"
+                       HorizontalAlignment="HorizontalAlignment.Right"
+                       Position="RelativePosition.Outside" />
+
+    </DxChart>
+}
+@if (seleccion == "Tornillo pala")
+{
+	<h1>@ventas</h1>
+}
+	
+
+
+@code {
+	//Array de todas las ventas existentes en la BD
+	public IEnumerable<Venta> ventas { get; set; }
+
+	//Opciones del comboBox para las graficas
+	public IEnumerable<String> Graficas = new List<String>()
+	{
+		"Tornillo estrella",
+		"Tornillo pala",
+		"Tornillo pala / Tornillo estrella",
+	};
+
+	public string seleccion { get; set; }
+
+	//Variable mensaje para mostrar las excepciones en el try catch
+	public string Message { get; set; }
+
+	protected async Task CargarGrafica()
+	{
+		try
+		{
+			//Metodo que carga todos los datos de la BD
+			ventas = await VentaService.GetVentasByArticulo(seleccion);
+		}
+		catch (Exception e)
+		{
+			//Mensaje de error excepcion
+			Message = e.Message;
+		}
+	}
+}

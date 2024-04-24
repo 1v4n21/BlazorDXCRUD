@@ -7,6 +7,7 @@ namespace BlazorDXCRUD.Data
 	{
 		Task<IEnumerable<Venta>> GetAllVentas();
 		Task<Venta> GetVentaDetails(int id);
+		Task<IEnumerable<Venta>> GetVentasByArticulo(string nombreArticulo);
 		Task<bool> InsertVenta(Venta venta);
 		Task<bool> UpdateVenta(Venta venta);
 		Task<bool> DeleteVenta(int id);
