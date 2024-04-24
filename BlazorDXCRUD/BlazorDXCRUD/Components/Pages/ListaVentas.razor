@@ -83,7 +83,8 @@ else
 					<!-- ComboBox con todos los valores de articulos -->
 					<DxComboBox Data="@Articulos"
                             NullText="Selecciona un articulo..."
-							@bind-Value="@Message">
+								FilteringMode="DataGridFilteringMode.Contains"
+								@bind-Value="@articulo">
 					</DxComboBox>
 				</DxFormLayoutItem>
 				<DxFormLayoutItem Caption="Ctd:" ColSpanMd="6">
@@ -109,6 +110,9 @@ else
 		"Clavo",
 		"Pasador",
 	};
+
+	//Nuevo articulo asignado
+	public string articulo { get; set; }
 
 	//Array de todas las ventas existentes en la BD
 	public IEnumerable<Venta> ventas { get; set; }
@@ -141,7 +145,7 @@ else
 		{
 			//Obtenemos los datos del formulario
 			dataItem.comprador = editModel.comprador;
-			dataItem.articulo = editModel.articulo;
+			dataItem.articulo = articulo;
 			dataItem.cantidad = editModel.cantidad;
 			dataItem.precio = editModel.precio;
 
