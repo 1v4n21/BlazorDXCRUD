@@ -75,6 +75,10 @@ else
 
 		<!-- Formulario de edicion con cada atributo de venta -->
 		<EditFormTemplate Context="editFormContext">
+			<!-- Obtenemos la venta a editar -->
+			@{
+				var venta = (Venta)editFormContext.EditModel;
+			}
 			<DxFormLayout>
 				<DxFormLayoutItem Caption="Comprador:" ColSpanMd="6">
 					@editFormContext.GetEditor("comprador")
@@ -84,7 +88,7 @@ else
 					<DxComboBox Data="@Articulos"
                             NullText="Selecciona un articulo..."
 								FilteringMode="DataGridFilteringMode.Contains"
-								@bind-Value="@articulo">
+								@bind-Value="@venta.articulo">
 					</DxComboBox>
 				</DxFormLayoutItem>
 				<DxFormLayoutItem Caption="Ctd:" ColSpanMd="6">
@@ -152,7 +156,7 @@ else
 		{
 			//Obtenemos los datos del formulario
 			dataItem.comprador = editModel.comprador;
-			dataItem.articulo = articulo;
+			dataItem.articulo = editModel.articulo;
 			dataItem.cantidad = editModel.cantidad;
 			dataItem.precio = editModel.precio;
 
@@ -164,7 +168,7 @@ else
 			else
 				await VentaService.UpdateVenta(dataItem);
 
-			//Refrscamos las ventas
+			//Refrescamos las ventas
 			await RefreshVenta();
 		}
 		else
