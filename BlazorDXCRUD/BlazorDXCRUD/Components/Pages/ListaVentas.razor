@@ -95,10 +95,15 @@ else
 					@editFormContext.GetEditor("cantidad")
 				</DxFormLayoutItem>
 				<DxFormLayoutItem Caption="Precio:" ColSpanMd="6">
-					@editFormContext.GetEditor("precio")
+					
 				</DxFormLayoutItem>
 				<DxFormLayoutItem Caption="Fecha:" ColSpanMd="6">
 					@editFormContext.GetEditor("Date")
+				</DxFormLayoutItem>
+
+				<!-- Validación del formulario -->
+				<DxFormLayoutItem ColSpanMd="12">
+					<ValidationSummary />
 				</DxFormLayoutItem>
 			</DxFormLayout>
 		</EditFormTemplate>
@@ -113,8 +118,8 @@ else
 }
 
 @code {
-	// Define los Articulos aquí
-	public IEnumerable<string> Articulos = new List<string>() {
+    // Define los Articulos aquí
+    public IEnumerable<string> Articulos = new List<string>() {
 		"Tornillo estrella",
 		"Tornillo pala",
 		"Tuerca",
@@ -122,43 +127,43 @@ else
 		"Pasador",
 	};
 
-	//Nuevo articulo asignado
-	public string articulo { get; set; }
+    //Nuevo articulo asignado
+    public string articulo { get; set; }
 
-	//Array de todas las ventas existentes en la BD
-	public IEnumerable<Venta> ventas { get; set; }
+    //Array de todas las ventas existentes en la BD
+    public IEnumerable<Venta> ventas { get; set; }
 
-	//Variable mensaje para mostrar las excepciones en el try catch
-	public string Message { get; set; }
+    //Variable mensaje para mostrar las excepciones en el try catch
+    public string Message { get; set; }
 
-	//Booleano para mostrar el popup
-	bool PopupVisible { get; set; } = false;
+    //Booleano para mostrar el popup
+    bool PopupVisible { get; set; } = false;
 
-	//Metodo que se ejecuta al iniciar la web
-	protected override async Task OnInitializedAsync()
-	{
-		//Tiempo de espera de 1sg
-		await Task.Delay(1000);
+    //Metodo que se ejecuta al iniciar la web
+    protected override async Task OnInitializedAsync()
+    {
+        //Tiempo de espera de 1sg
+        await Task.Delay(1000);
 
-		//Refrescamos las ventas
-		await RefreshVenta();
-	}
+        //Refrescamos las ventas
+        await RefreshVenta();
+    }
 
-	//Metodo para guardar la venta
-	protected async Task SaveVenta(GridEditModelSavingEventArgs e)
-	{
-		//Objeto venta del grid
-		var editModel = (Venta)e.EditModel;
-		var dataItem = e.IsNew ? new Venta() : (Venta)e.DataItem;
+    //Metodo para guardar la venta
+    protected async Task SaveVenta(GridEditModelSavingEventArgs e)
+    {
+        //Objeto venta del grid
+        var editModel = (Venta)e.EditModel;
+        var dataItem = e.IsNew ? new Venta() : (Venta)e.DataItem;
 
-		//Comprobamos que se han introducido datos en el formulario
-		if (editModel.articulo != "" && editModel.cantidad != 0)
-		{
-			//Obtenemos los datos del formulario
-			dataItem.comprador = editModel.comprador;
-			dataItem.articulo = editModel.articulo;
-			dataItem.cantidad = editModel.cantidad;
-			dataItem.precio = editModel.precio;
+        //Comprobamos que se han introducido datos en el formulario
+        if (editModel.articulo != "" && editModel.cantidad != 0)
+        {
+            //Obtenemos los datos del formulario
+            dataItem.comprador = editModel.comprador;
+            dataItem.articulo = editModel.articulo;
+            dataItem.cantidad = editModel.cantidad;
+            dataItem.precio = editModel.cantidad * 2;
 
 			dataItem.Date = editModel.Date;
 

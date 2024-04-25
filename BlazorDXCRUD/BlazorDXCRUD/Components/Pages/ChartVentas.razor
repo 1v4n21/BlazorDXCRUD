@@ -23,18 +23,18 @@
 
 <DxComboBox Data="Graficas" NullText="Selecciona un articulo..." 
 			FilteringMode="DataGridFilteringMode.Contains" @bind-Value="@seleccion"
-			@onclick="CargarGrafica"/>
+			/>
 
 <br />
 
-@if (seleccion == "Tornillo estrella")
-{
+@if (seleccion != "")
+{    
     <!-- Crea el grafico en base a los forecast -->
     <DxChart Data="@ventas" LabelOverlap="ChartLabelOverlap.Hide">
         <!-- Para que no se superpongan las etiquetas -->
         <!-- Titulo de grafico -->
         <DxChartTitle Text="Ventas">
-            <DxChartSubTitle Text="(tornillo estrella)" />
+            <DxChartSubTitle Text="@seleccion" />
         </DxChartTitle>
 
         <!-- Eje de abajo fecha -->
@@ -82,30 +82,24 @@
                        Position="RelativePosition.Outside" />
 
     </DxChart>
-}
-@if (seleccion == "Tornillo pala")
-{
-	<h1>@ventas</h1>
-}
-	
-
+}	
 
 @code {
-	//Array de todas las ventas existentes en la BD
-	public IEnumerable<Venta> ventas { get; set; }
+    //Array de todas las ventas existentes en la BD
+    public IEnumerable<Venta> ventas { get; set; }
 
-	//Opciones del comboBox para las graficas
-	public IEnumerable<String> Graficas = new List<String>()
+    //Opciones del comboBox para las graficas
+    public IEnumerable<String> Graficas = new List<String>()
 	{
 		"Tornillo estrella",
 		"Tornillo pala",
 		"Tornillo pala / Tornillo estrella",
 	};
 
-	public string seleccion { get; set; }
+    public string seleccion { get; set; }
 
-	//Variable mensaje para mostrar las excepciones en el try catch
-	public string Message { get; set; }
+    //Variable mensaje para mostrar las excepciones en el try catch
+    public string Message { get; set; }
 
 	protected async Task CargarGrafica()
 	{
