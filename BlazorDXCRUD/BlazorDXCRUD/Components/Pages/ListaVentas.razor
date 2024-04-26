@@ -1,6 +1,7 @@
 ﻿<!-- Ruta de la vista actual -->
 @page "/listaVentas"
 @using BlazorDXCRUD.Models
+@using DevExpress.Data.Filtering;
 
 <!-- Utilizar DOM en Blazor -->
 @rendermode InteractiveServer
@@ -50,14 +51,23 @@ else
 	<!-- KeyField = campo del id de la venta -->
 	<!-- Panel de grupo, de filtracion y eventos de borrado y editado/nuevo -->
 	<DxGrid Data="@ventas" KeyFieldName="Id"
-			ShowGroupPanel="true" 
-			ShowFilterRow="true"
+			ShowGroupPanel="true"
+			FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+			KeyboardNavigationEnabled="true"
 			EditModelSaving="SaveVenta"
 			DataItemDeleting="DeleteVenta">
 		<Columns>
 			<!-- Columnas con los atributos de venta -->
 			<DxGridDataColumn FieldName="comprador" Caption="Comprador" />
-			<DxGridDataColumn FieldName="articulo" Caption="Articulo" />
+			<DxGridDataColumn FieldName="articulo" Caption="Articulo">
+				@* <!-- Buscador comboBox -->
+				<FilterRowCellTemplate>
+					<DxComboBox @bind-Value="context.FilterCriteria"
+								Data="@Articulos" ValueFieldName="Criteria" TextFieldName="DisplayText"
+								ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+								aria-label="Selecciona un articulo" />
+				</FilterRowCellTemplate> *@
+			</DxGridDataColumn>
 			<DxGridDataColumn FieldName="cantidad" Caption="Ctd" />
 			<DxGridDataColumn FieldName="precio" Caption="€" />
 
@@ -104,10 +114,13 @@ else
 					@editFormContext.GetEditor("cantidad")
 				</DxFormLayoutItem>
 
-				<!-- Atributo precio -->
+				@* <!-- Atributo precio -->
 				<DxFormLayoutItem Caption="Precio:" ColSpanMd="6">
+					@{
+						venta.precio = venta.cantidad*2;
+					}
 					@editFormContext.GetEditor("precio")
-				</DxFormLayoutItem>
+				</DxFormLayoutItem> *@
 
 				<!-- Atributo fecha -->
 				<DxFormLayoutItem Caption="Fecha:" ColSpanMd="6">
@@ -132,8 +145,8 @@ else
 }
 
 @code {
-    // Tipos de articulos en las ventas
-    public IEnumerable<string> Articulos = new List<string>() {
+	// Tipos de articulos en las ventas
+	public IEnumerable<string> Articulos = new List<string>() {
 		"Tornillo estrella",
 		"Tornillo pala",
 		"Tuerca",
@@ -141,43 +154,45 @@ else
 		"Pasador",
 	};
 
-    //Nuevo articulo asignado
-    public string articulo { get; set; }
+	//Nuevo articulo asignado
+	public string articulo { get; set; }
 
-    //Array de todas las ventas existentes en la BD
-    public IEnumerable<Venta> ventas { get; set; }
+	//Array de todas las ventas existentes en la BD
+	public IEnumerable<Venta> ventas { get; set; }
 
-    //Variable mensaje para mostrar las excepciones en el try catch
-    public string Message { get; set; }
+	//Variable mensaje para mostrar las excepciones en el try catch
+	public string Message { get; set; }
 
-    //Booleano para mostrar el popup en caso de campos vacios (articulo, cantidad)
-    bool PopupVisible { get; set; } = false;
+	//Booleano para mostrar el popup en caso de campos vacios (articulo, cantidad)
+	bool PopupVisible { get; set; } = false;
 
-    //Metodo que se ejecuta al iniciar la web
-    protected override async Task OnInitializedAsync()
-    {
-        //Tiempo de espera de 1sg
-        await Task.Delay(1000);
+	//Metodo que se ejecuta al iniciar la web
+	protected override async Task OnInitializedAsync()
+	{
+		//Tiempo de espera de 1sg
+		await Task.Delay(1000);
 
         //Refrescamos las ventas
-        await RefreshVenta();
-    }
+		await RefreshVenta();
+	}
 
-    //Metodo para guardar la venta
-    protected async Task SaveVenta(GridEditModelSavingEventArgs e)
-    {
-        //Objeto venta del grid
-        var editModel = (Venta)e.EditModel;
-        var dataItem = e.IsNew ? new Venta() : (Venta)e.DataItem;
+	//Metodo para guardar la venta
+	protected async Task SaveVenta(GridEditModelSavingEventArgs e)
+	{
+	//Objeto venta del grid
+		var editModel = (Venta)e.EditModel;
+		var dataItem = e.IsNew ? new Venta() : (Venta)e.DataItem;
 
         //Comprobamos que se han introducido datos en el formulario
-        if (editModel.articulo != "" && editModel.cantidad != 0)
-        {
-            //Obtenemos los datos del formulario
-            dataItem.comprador = editModel.comprador;
-            dataItem.articulo = editModel.articulo;
-            dataItem.cantidad = editModel.cantidad;
-            dataItem.precio = editModel.cantidad * 2;
+		if (editModel.articulo != "" && editModel.cantidad != 0)
+		{
+		//Obtenemos los datos del formulario
+			dataItem.comprador = editModel.comprador;
+			dataItem.articulo = editModel.articulo;
+			dataItem.cantidad = editModel.cantidad;
+
+			//Calculamos  el precio
+			dataItem.precio = editModel.cantidad * 2;
 
 			dataItem.Date = editModel.Date;
 
