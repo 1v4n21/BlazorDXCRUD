@@ -65,7 +65,7 @@ namespace BlazorDXCRUD.Data
 		//Metodo intermediario para saber si es un insert o update
 		public async Task<bool> SaveVenta(Venta venta)
 		{
-			//Si elid de la venta no es cero es un UPDATE si es 0 es nueva, INSERT
+			//Si el id de la venta no es cero es un UPDATE si es 0 es nueva (INSERT)
 			if(venta.Id > 0)
 
 			{
