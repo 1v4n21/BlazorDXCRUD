@@ -21,19 +21,23 @@
 <!-- Mensaje de error en el caso de lanzar excepcion -->
 @Message
 
+<!-- ComboBox para seleccionar el grafico que queremos ver -->
 <DxComboBox Data="Graficas" NullText="Selecciona un articulo..." 
 			FilteringMode="DataGridFilteringMode.Contains" @bind-Value="@seleccion"
-			/>
+			@onclick="CargarGrafica"/>
 
+<!-- Espacio en blanco -->
 <br />
 
+<!-- Comprobamos que se ha seleccionado un valor en el comboBox para cargar la grafica -->
 @if (seleccion != "")
 {    
-    <!-- Crea el grafico en base a los forecast -->
+    <!-- Crea el grafico en base a las ventas seleccionadas -->
     <DxChart Data="@ventas" LabelOverlap="ChartLabelOverlap.Hide">
         <!-- Para que no se superpongan las etiquetas -->
-        <!-- Titulo de grafico -->
+        <!-- Titulo del grafico -->
         <DxChartTitle Text="Ventas">
+            <!-- Subtitulo del grafico, será el articulo seleccionado -->
             <DxChartSubTitle Text="@seleccion" />
         </DxChartTitle>
 
@@ -43,17 +47,19 @@
             <DxChartAxisLabel Format='ChartElementFormat.ShortDate' /> <!-- Formato -->
         </DxChartArgumentAxis>
 
-        <!-- Eje izq y eje der -->
+        <!-- Eje izquierdo -->
+        <!-- Alinea con la cantidad -->
         <DxChartValueAxis>
             <DxChartAxisTitle Text="Cantidad, unidades" />
         </DxChartValueAxis>
 
-        <!-- Alinea con las temperaturas -->
+        <!-- Eje derecho -->
+        <!-- Alinea con el precio -->
         <DxChartValueAxis Name="precio" Alignment="ChartAxisAlignment.Far">
             <DxChartAxisTitle Text="Precio, €" />
         </DxChartValueAxis>
 
-        <!-- Barras de precipitacion BarSeries -->
+        <!-- Barras de cantidad BarSeries -->
         <DxChartBarSeries ArgumentField="@((Venta i) => i.Date)"
                           ValueField="@((Venta i) => i.cantidad)"
                           Name="Cantidad">
@@ -62,21 +68,21 @@
             <DxChartSeriesLabel Visible="true" />
         </DxChartBarSeries>
 
-        <!-- Lineas de temperatura LineSeries -->
+        <!-- Lineas de precio LineSeries -->
         <DxChartLineSeries ArgumentField="@((Venta i) => i.Date)"
                            ValueField="@((Venta i) => i.precio)"
                            Name="Precio"
                            Axis="precio">
-            <!-- Modificar los puntos polygon, size 20 -->
+            <!-- Modificar los puntos a polygon, size 20 -->
             <DxChartSeriesPoint Symbol="ChartPointSymbol.Polygon" Size="20" />
 
-            <!-- Mostrar Etiquetas visible=true width=2 -->
+            <!-- Mostrar Etiquetas visible=true y tamaño width=2 -->
             <DxChartSeriesLabel Visible="true">
                 <DxChartSeriesLabelConnector Visible="true" Width="2" />
             </DxChartSeriesLabel>
         </DxChartLineSeries>
 
-        <!-- Personalizar la leyenda Horizontal, Right -->
+        <!-- Personalizar la leyenda Horizontal, Right (Arriba a la derecha) -->
         <DxChartLegend Orientation="Orientation.Horizontal"
                        HorizontalAlignment="HorizontalAlignment.Right"
                        Position="RelativePosition.Outside" />
@@ -85,7 +91,7 @@
 }	
 
 @code {
-    //Array de todas las ventas existentes en la BD
+    //Array de todas las ventas existentes en la BD con el metodo CargarGrafica()
     public IEnumerable<Venta> ventas { get; set; }
 
     //Opciones del comboBox para las graficas
@@ -96,11 +102,13 @@
 		"Tornillo pala / Tornillo estrella",
 	};
 
+    //Opcion que seleccionamos en el ComboBox
     public string seleccion { get; set; }
 
     //Variable mensaje para mostrar las excepciones en el try catch
     public string Message { get; set; }
 
+    //Metodo para cargar la grafica en base a la opcion seleccionada
 	protected async Task CargarGrafica()
 	{
 		try

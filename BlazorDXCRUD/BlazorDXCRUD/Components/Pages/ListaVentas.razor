@@ -11,12 +11,13 @@
 <!-- Injectamos las clases con un nombre apuntando a ellas -->
 @inject IVentaService VentaService
 
-<!-- Clse para redirigir a rutas -->
+<!-- Clase para redirigir a otras rutas -->
 @inject NavigationManager NavigationManager
 
 <!-- Titulo de la pagina -->
 <PageTitle>Grid de Ventas</PageTitle>
 
+<!-- Espacio en blanco -->
 <br>
 
 <!-- h1 de la vista -->
@@ -28,9 +29,10 @@
 <!-- Mensaje de error en el caso de lanzar excepcion -->
 @Message
 
+<!-- Espacio en blanco -->
 <br>
 
-<!-- Popup para mostrar cuando no se completan todos los campos -->
+<!-- Popup para mostrar cuando no se completan todos los campos (Validacion) -->
 <DxPopup HeaderText="Mensaje"
 		 @bind-Visible="@PopupVisible"
 		 BodyText="Los campos son obligatorios">
@@ -45,10 +47,11 @@
 else
 {
 	<!-- Tabla con las ventas y sus datos -->
-	<!-- Panel de grupo, de filtracion y eventos de borrado y editado/nuevo -->
 	<!-- KeyField = campo del id de la venta -->
+	<!-- Panel de grupo, de filtracion y eventos de borrado y editado/nuevo -->
 	<DxGrid Data="@ventas" KeyFieldName="Id"
-			ShowGroupPanel="true" ShowFilterRow="true"
+			ShowGroupPanel="true" 
+			ShowFilterRow="true"
 			EditModelSaving="SaveVenta"
 			DataItemDeleting="DeleteVenta">
 		<Columns>
@@ -67,7 +70,7 @@ else
 			<DxGridCommandColumn />
 		</Columns>
 
-		<!-- Sumario total de ventas en base al comprador -->
+		<!-- Sumario total de ventas en base al atributo comprador -->
 		<TotalSummary>
 			<DxGridSummaryItem FooterColumnName="comprador"
 							   SummaryType=GridSummaryItemType.Count />
@@ -75,14 +78,18 @@ else
 
 		<!-- Formulario de edicion con cada atributo de venta -->
 		<EditFormTemplate Context="editFormContext">
-			<!-- Obtenemos la venta a editar -->
+			<!-- Obtenemos la venta a editar (EditModel) -->
 			@{
 				var venta = (Venta)editFormContext.EditModel;
 			}
+			<!-- Formulario de edicion -->
 			<DxFormLayout>
+				<!-- Atributo comprador -->
 				<DxFormLayoutItem Caption="Comprador:" ColSpanMd="6">
 					@editFormContext.GetEditor("comprador")
 				</DxFormLayoutItem>
+
+				<!-- Atributo articulo -->
 				<DxFormLayoutItem Caption="Articulo:" ColSpanMd="6">
 					<!-- ComboBox con todos los valores de articulos -->
 					<DxComboBox Data="@Articulos"
@@ -91,12 +98,18 @@ else
 								@bind-Value="@venta.articulo">
 					</DxComboBox>
 				</DxFormLayoutItem>
+
+				<!-- Atributo cantidad -->
 				<DxFormLayoutItem Caption="Ctd:" ColSpanMd="6">
 					@editFormContext.GetEditor("cantidad")
 				</DxFormLayoutItem>
+
+				<!-- Atributo precio -->
 				<DxFormLayoutItem Caption="Precio:" ColSpanMd="6">
 					@editFormContext.GetEditor("precio")
 				</DxFormLayoutItem>
+
+				<!-- Atributo fecha -->
 				<DxFormLayoutItem Caption="Fecha:" ColSpanMd="6">
 					@editFormContext.GetEditor("Date")
 				</DxFormLayoutItem>
@@ -105,20 +118,21 @@ else
 				<DxFormLayoutItem ColSpanMd="12">
 					<ValidationSummary />
 				</DxFormLayoutItem>
+
 			</DxFormLayout>
 		</EditFormTemplate>
 	</DxGrid>
 
 	<br />
 
-	<!-- Enlace para ir a la pagina de añadir libro -->
+	<!-- Enlace para ir a la pagina de graficas de ventas -->
 	<div>
 		<a href="/chartVentas"><i>Graficas de Ventas</i></a>
 	</div>
 }
 
 @code {
-    // Define los Articulos aquí
+    // Tipos de articulos en las ventas
     public IEnumerable<string> Articulos = new List<string>() {
 		"Tornillo estrella",
 		"Tornillo pala",
@@ -136,7 +150,7 @@ else
     //Variable mensaje para mostrar las excepciones en el try catch
     public string Message { get; set; }
 
-    //Booleano para mostrar el popup
+    //Booleano para mostrar el popup en caso de campos vacios (articulo, cantidad)
     bool PopupVisible { get; set; } = false;
 
     //Metodo que se ejecuta al iniciar la web
